@@ -1,16 +1,17 @@
+import * as dotenv from "dotenv";
+dotenv.config({ path: ".env" });
 import createError, { HttpError } from  'http-errors';
 import express, { NextFunction } from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from  'morgan';
-import dotenv from 'dotenv';
 
-import indexRouter from '../routes/index';
-import usersRouter from '../routes/users';
+
+import indexRouter from './routes/index';
+import usersRouter from './routes/users';
 
 const app = express();
 
-dotenv.config({ path: 'config.env'})
 
 // view engine setup
 app.set('views', path.join(__dirname,'..', 'views'));
@@ -31,7 +32,7 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function(err:any, req:any, res:any, next:any) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

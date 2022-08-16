@@ -3,20 +3,21 @@
 /**
  * Module dependencies.
  */
- const mongoose = require("mongoose")
-var app = require('../app');
-var debug = require('debug')('wallet:server');
+
+ var app = require('../dist/app').default;
+var debug = require('debug')('jobsApi:server');
 var http = require('http');
 
-
+const mongoose = require("mongoose")
  // momgoose
  const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD)
+
  mongoose.connect(DB,{
    useNewUrlParser: true,
    useUnifiedTopology: true
  }).then(() =>  console.log(' db connection successful'));
 
- 
+
 /**
  * Get port from environment and store in Express.
  */
