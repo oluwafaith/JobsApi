@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-
+import jwt from "jsonwebtoken"
 export interface WalletUser {
   name: string;
   email: string;
@@ -13,8 +13,6 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please tell us your name!"],
-    minlength: 3, 
-    maxlength: 50
   },
   email: {
     type: String,
@@ -28,17 +26,29 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please provide password"],
     minlength: 6,
   },
+  
 });
 
-// userSchema.pre("save", async function () {
-//   const salt = await bcrypt.genSalt(10);
-// //   this.password = await bcrypt.hash(this.password, salt);
- 
-// });
 
-// userSchema.methods.comparePassword = async function (userPassword: any) {
-// //   const isMatch = await bcrypt.compare(userPassword, this.password);
-//   return isMatch;
-// };
+const token: any = process.env.JWT_SECRET
+userSchema.pre< WalletUser>('save', async function () {
+    const salt = await bcrypt.genSalt(10)
+    this.password = await bcrypt.hash(this.password, salt)
+  })
+  
+  userSchema.methods.createJWT = function () {
+    return jwt.sign(
+      { userId: this._id, name: this.name },
+      token,
+      {
+        expiresIn: process.env.JWT_LIFETIME,
+      }
+    )
+  }
+  
+  userSchema.methods.comparePassword = async function (canditatePassword: any) {
+    const isMatch = await bcrypt.compare(canditatePassword, this.password)
+    return isMatch
+  }
 
 export const User = mongoose.model("User", userSchema);
