@@ -29,7 +29,16 @@ const userSchema = new mongoose.Schema({
   
 });
 
+// userSchema.pre("save", async function () {
+//   const salt = await bcrypt.genSalt(10);
+// //   this.password = await bcrypt.hash(this.password, salt);
+ 
+// });
 
+// userSchema.methods.comparePassword = async function (userPassword: any) {
+// //   const isMatch = await bcrypt.compare(userPassword, this.password);
+// //   return isMatch;
+// };
 const token: any = process.env.JWT_SECRET
 userSchema.pre< WalletUser>('save', async function () {
     const salt = await bcrypt.genSalt(10)
@@ -37,8 +46,12 @@ userSchema.pre< WalletUser>('save', async function () {
   })
   
   userSchema.methods.createJWT = function () {
+    
+    const name:any = this.name
+    const id = this._id
+    
     return jwt.sign(
-      { userId: this._id, name: this.name },
+      { userId: id, name:name},
       token,
       {
         expiresIn: process.env.JWT_LIFETIME,

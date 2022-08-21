@@ -1,27 +1,80 @@
-import {Request, Response} from 'express'
+import { Request, Response, NextFunction } from "express"
+import {Job} from '../models/Job'
+import { StatusCodes } from 'http-status-codes'
+import { BadRequestError, NotFoundError } from '../errors'
 
-const   getAllJobs = async (req :Request, res: Response) => {
 
-  res.send('register')
+
+const getAllJobs = async (req: any, res:Response) => {
+   
+  const jobs = await Job.find({ createdBy: req.user.userId }).sort('createdAt')
+  res.status(StatusCodes.OK).json({ jobs, count: jobs.length })
 }
-const getJob = async (req :Request, res: Response) => {
+const getJob = async (req: any, res:Response) => {
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req
 
-  res.send('register')
+  const job = await Job.findOne({
+    _id: jobId,
+    createdBy: userId,
+  })
+  if (!job) {
+    throw new NotFoundError(`No job with id ${jobId}`)
+  }
+  res.status(StatusCodes.OK).json({ job })
 }
-const createJob = async (req :Request, res: Response) => {
 
-  res.send('register')
-}
-const updateJob = async (req :Request, res: Response) => {
-
-  res.send('register')
-}
-
-const deleteJob = async (req:Request, res: Response) => {
+const createJob = async (req:any, res:Response) => {
   
-  res.send('login')
+  req.body.createdBy = req.user.userId
+ 
+  const job = await Job.create(req.body)
+  res.status(StatusCodes.CREATED).json({ job })
 }
 
-export  {
- createJob, updateJob, deleteJob,getAllJobs,getJob
+const updateJob = async (req:any, res:Response) => {
+  const {
+    body: { company, position },
+    user: { userId },
+    params: { id: jobId },
+  } = req
+
+  if (company === '' || position === '') {
+    throw new BadRequestError('Company or Position fields cannot be empty')
+  }
+  const job = await Job.findByIdAndUpdate(
+    { _id: jobId, createdBy: userId },
+    req.body,
+    { new: true, runValidators: true }
+  )
+  if (!job) {
+    throw new NotFoundError(`No job with id ${jobId}`)
+  }
+  res.status(StatusCodes.OK).json({ job })
+}
+
+const deleteJob = async (req:any, res:Response) => {
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req
+
+  const job = await Job.findByIdAndRemove({
+    _id: jobId,
+    createdBy: userId,
+  })
+  if (!job) {
+    throw new NotFoundError(`No job with id ${jobId}`)
+  }
+  res.status(StatusCodes.OK).send()
+}
+
+export {
+  createJob,
+  deleteJob,
+  getAllJobs,
+  updateJob,
+  getJob,
 }
