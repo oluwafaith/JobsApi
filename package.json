@@ -6,7 +6,7 @@
     "start": "node ./bin/www",
     "tsc": "./node_modules/typescript/bin/tsc",
     "build": "tsc",
-    "postinstall": "npm run build"
+    "postinstall": "yarn build"
   },
   "dependencies": {
     "@types/cors": "^2.8.12",
