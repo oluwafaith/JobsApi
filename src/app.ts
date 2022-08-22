@@ -8,8 +8,6 @@ import logger from  'morgan';
 import helmet from 'helmet';
 import cors from "cors";
 import mongoSanitize from "express-mongo-sanitize"
-import rateLimiter from 'express-rate-limit';
-
 
 import  authenticateUser from'./middleware/authentication'
 import indexRouter from './routes/index';
@@ -24,13 +22,7 @@ app.set('views', path.join(__dirname,'..', 'views'));
 app.set('view engine', 'ejs');
 
 app.set('trust proxy', 1);
-app.use(
-  rateLimiter({
-    windowMs: 15 * 60 * 1000,
-    max: 100, 
-  })
-);
-// app.use(logger('dev'));
+
 app.use(helmet());
 app.use(cors());
 app.use(mongoSanitize());
