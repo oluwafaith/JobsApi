@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
+import mongoose,{Document} from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
-export interface WalletUser {
+export interface JobUser {
   name: string;
   email: string;
   password: string;
-  roles: any[];
+  
 }
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema<JobUser>({
   name: {
     type: String,
     required: [true, "Please tell us your name!"],
@@ -29,18 +29,9 @@ const userSchema = new mongoose.Schema({
   
 });
 
-// userSchema.pre("save", async function () {
-//   const salt = await bcrypt.genSalt(10);
-// //   this.password = await bcrypt.hash(this.password, salt);
- 
-// });
 
-// userSchema.methods.comparePassword = async function (userPassword: any) {
-// //   const isMatch = await bcrypt.compare(userPassword, this.password);
-// //   return isMatch;
-// };
 const token: any = process.env.JWT_SECRET
-userSchema.pre< WalletUser>('save', async function () {
+userSchema.pre< JobUser>('save', async function () {
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
   })
@@ -49,6 +40,7 @@ userSchema.pre< WalletUser>('save', async function () {
     
     const name:any = this.name
     const id = this._id
+    
     
     return jwt.sign(
       { userId: id, name:name},
