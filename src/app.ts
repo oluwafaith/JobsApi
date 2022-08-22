@@ -14,6 +14,11 @@ import indexRouter from './routes/index';
 import jobsRouter from './routes/jobs';
 import authRouter from './routes/auth';
 
+import swaggerUI from "swagger-ui-express"
+import YAML from "yamljs"
+
+const swaggerDocument = YAML.load("./swagger.yaml")
+
 const app = express();
 
 
@@ -21,7 +26,7 @@ const app = express();
 app.set('views', path.join(__dirname,'..', 'views'));
 app.set('view engine', 'ejs');
 
-app.set('trust proxy', 1);
+// app.set('trust proxy', 1);
 
 app.use(helmet());
 app.use(cors());
@@ -35,6 +40,11 @@ app.use(express.static(path.join(__dirname,'..', 'public')));
 
 
 app.use(express.json({ limit: '10kb' }));
+
+app.get('/', (_req, res) => {
+  res.send('<h1>Jobs API</h1><a href="/api-docs">Documentation</a>');
+});
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 app.use('/', indexRouter);
 app.use('/api/v1/auth', authRouter);
